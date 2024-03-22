@@ -8,33 +8,43 @@ const CAT_PREFIX_IMG_URL = "https://cataas.com";
 function App() {
   const [fact, setFact] = useState();
   const [imageUrl, setImageUrl] = useState();
+  const [factError, setFactError] = useState();
 
+  //Recuperar cita al cargar la pagina
   useEffect(() => {
     fetch(CAT_ENDPOINT_RANDOM_FACT)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          setFactError("No se ha podido recuperar la cita");
+        }
+        return res.json();
+      })
       .then((data) => {
         const { fact } = data;
         setFact(fact);
-
-        const threeFirstWords = fact.split(" ", 3).join(" ");
-        //para mas palabras
-        // const firstWord = fact.split(' ').slice[0,3].join(' ')
-
-        fetch(
-          `https://cataas.com/cat/says/${threeFirstWords}?size=50&color=red&json=true`
-        )
-          .then((res) => res.json())
-          .then((response) => {
-            const { url } = response;
-            setImageUrl(url);
-          });
       });
   }, []);
+
+  //Recuperar imagen cada que hay imagen nueva
+  useEffect(() => {
+    if (!fact) return;
+    const threeFirstWords = fact.split(" ", 3).join(" ");
+
+    fetch(
+      `https://cataas.com/cat/says/${threeFirstWords}?size=50&color=red&json=true`
+    )
+      .then((res) => res.json())
+      .then((response) => {
+        const { url } = response;
+        setImageUrl(url);
+      });
+  }, [fact]);
 
   return (
     <main>
       <h1>App de gatitos</h1>
       {fact && <p>{fact}</p>}
+      <p>{imageUrl}</p>
       {imageUrl && (
         <img
           src={`${CAT_PREFIX_IMG_URL}${imageUrl}`}

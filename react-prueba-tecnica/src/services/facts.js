@@ -3,9 +3,6 @@ const CAT_ENDPOINT_RANDOM_FACT = "https://catfact.ninja/fact";
 //NO TRAERSE NADA DE REACT EJ.USESTATE
 export const getRandomFact = async () => {
   const res = await fetch(CAT_ENDPOINT_RANDOM_FACT);
-  if (!res.ok) {
-    setFactError("No se ha podido recuperar la cita");
-  }
   const data = await res.json();
   const { fact } = data;
   return fact;

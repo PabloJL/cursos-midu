@@ -1,6 +1,9 @@
 import "./App.css";
+import { Movies } from "./components/movies";
+import { useMovies } from "./hooks/useMovies";
 
 function App() {
+  const { movies: mappedMovies } = useMovies();
   return (
     <div className="page">
       <header>
@@ -11,7 +14,9 @@ function App() {
         </form>
       </header>
 
-      <main>Resultados</main>
+      <main>
+        <Movies movies={mappedMovies} />
+      </main>
     </div>
   );
 }

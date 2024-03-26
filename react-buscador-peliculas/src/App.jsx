@@ -36,13 +36,14 @@ function useSearch() {
 }
 
 function App() {
-  const { movies } = useMovies();
   const { search, updateSearch, error } = useSearch();
+  const { movies, getMovies } = useMovies({ search });
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    getMovies();
 
-    //No conctolada, este es un objeto que sacamos del DOM al momento de hacer submit
+    //No controlada, este es un objeto que sacamos del DOM al momento de hacer submit
     //const { query } = Object.fromEntries(new window.FormData(event.target));
 
     //aqui se pueden hacer validaciones

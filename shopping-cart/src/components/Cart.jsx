@@ -1,4 +1,4 @@
-import { ClearCartIcon, RemoveFromCartIcon, CartIcon } from "./Icons.jsx";
+import { ClearCartIcon, CartIcon } from "./Icons.jsx";
 import { useId } from "react";
 import "./Cart.css";
 
@@ -14,7 +14,10 @@ function Cart() {
       <aside className="cart">
         <ul>
           <li>
-            <img src="" alt="iphone" />
+            <img
+              src="https://media.es.wired.com/photos/6500b64ec39444b642c78a09/1:1/w_1800,h_1800,c_limit/Apple-iPhone-15-Pro-Hero-Gear.jpg"
+              alt="iphone"
+            />
             <div>
               <strong>Iphone</strong> -$1499
             </div>

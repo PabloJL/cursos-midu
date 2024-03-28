@@ -1,8 +1,27 @@
+/* eslint-disable react/prop-types */
 import { ClearCartIcon, CartIcon } from "./Icons.jsx";
 import { useId } from "react";
+import { useCart } from "../hooks/useCart.js";
 import "./Cart.css";
 
+function CartItem({ thumbnail, price, title, quantity, addToCart }) {
+  return (
+    <li>
+      <img src={thumbnail} alt={title} />
+      <div>
+        <strong>{title}</strong> - ${price}
+      </div>
+
+      <footer>
+        <small>Qty: {quantity}</small>
+        <button onClick={addToCart}>+</button>
+      </footer>
+    </li>
+  );
+}
+
 function Cart() {
+  const { cart, clearCart, addToCart } = useCart();
   const cartCheckBoxId = useId();
   return (
     <>
@@ -13,22 +32,15 @@ function Cart() {
 
       <aside className="cart">
         <ul>
-          <li>
-            <img
-              src="https://media.es.wired.com/photos/6500b64ec39444b642c78a09/1:1/w_1800,h_1800,c_limit/Apple-iPhone-15-Pro-Hero-Gear.jpg"
-              alt="iphone"
+          {cart.map((product) => (
+            <CartItem
+              key={product.id}
+              addToCart={() => addToCart(product)}
+              {...product}
             />
-            <div>
-              <strong>Iphone</strong> -$1499
-            </div>
-
-            <footer>
-              <small>Qty: 1</small>
-              <button>+</button>
-            </footer>
-          </li>
+          ))}
         </ul>
-        <button>
+        <button onClick={clearCart}>
           <ClearCartIcon />
         </button>
       </aside>

@@ -21,7 +21,13 @@ const successText = success ? "Exito" : "Fracaso";
 
   <header class="p-4 flex-grow">
     <span
-      class={`text-xs font-semibold mr-2 px-2.5 py-0.5 rounded ${success ? "bg-green-500 text-green-800" : "bg-red-500 text-red-800"}`}
+      class:list={[
+        "text-xs font-semibold mr-2 px-2.5 py-0.5 rounded", //todas estas si o si las aplica
+        {
+          "bg-green-500 text-green-800": success,
+          "bg-red-500 text-red-800": !success,
+        },
+      ]}
     >
       {successText}
     </span>

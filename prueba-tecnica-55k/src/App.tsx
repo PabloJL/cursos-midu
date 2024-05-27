@@ -7,6 +7,8 @@ function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [showColors, setShowColors] = useState(false);
   const [sortByCountry, setSortByCounty] = useState(false);
+  const [filterCountry, setFilterCountry] = useState<string | null>(null);
+
   const originalUsers = useRef<User[]>([]);
 
   const toggleColors = () => {
@@ -38,11 +40,20 @@ function App() {
       });
   }, []);
 
+  const filteredUsers =
+    typeof filterCountry === "string" && filterCountry.length > 0
+      ? users.filter((user) => {
+          return user.location.country
+            .toLowerCase()
+            .includes(filterCountry.toLowerCase());
+        })
+      : users;
+
   const sortedUsers = sortByCountry
-    ? users.toSorted((a, b) => {
+    ? filteredUsers.toSorted((a, b) => {
         return a.location.country.localeCompare(b.location.country);
       })
-    : users;
+    : filteredUsers;
   //el .sort solo muta el array og por lo cual no se puede volver al og cuando seleccionamos unsort. toSorted devuelve un nuevo array
 
   return (
@@ -54,6 +65,14 @@ function App() {
           {sortByCountry ? "Unsort" : "Sort by Country"}
         </button>
         <button onClick={handleReset}>Resetear Estado</button>
+
+        <input
+          type="text"
+          placeholder="Filtra por pais"
+          onChange={(e) => {
+            setFilterCountry(e.target.value);
+          }}
+        />
       </header>
       <main>
         <UsersList

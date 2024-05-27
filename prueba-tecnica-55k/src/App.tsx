@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { type User } from "./types";
 import { UsersList } from "./components/UsersList";
@@ -7,6 +7,7 @@ function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [showColors, setShowColors] = useState(false);
   const [sortByCountry, setSortByCounty] = useState(false);
+  const originalUsers = useRef<User[]>([]);
 
   const toggleColors = () => {
     setShowColors(!showColors);
@@ -14,6 +15,10 @@ function App() {
 
   const toggleSortByCountry = () => {
     setSortByCounty((prevState) => !prevState);
+  };
+
+  const handleReset = () => {
+    setUsers(originalUsers.current);
   };
 
   const handleDelete = (email: string) => {
@@ -26,6 +31,7 @@ function App() {
       .then(async (res) => await res.json())
       .then((res) => {
         setUsers(res.results);
+        originalUsers.current = res.results;
       })
       .catch((err) => {
         console.error(err);
@@ -47,6 +53,7 @@ function App() {
         <button onClick={toggleSortByCountry}>
           {sortByCountry ? "Unsort" : "Sort by Country"}
         </button>
+        <button onClick={handleReset}>Resetear Estado</button>
       </header>
       <main>
         <UsersList

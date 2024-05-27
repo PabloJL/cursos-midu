@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
-import { type User } from "./types";
+import { SortBy, type User } from "./types.d";
 import { UsersList } from "./components/UsersList";
 
 function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [showColors, setShowColors] = useState(false);
-  const [sortByCountry, setSortByCounty] = useState(false);
+  const [sorting, setSorting] = useState<SortBy>(SortBy.NONE);
   const [filterCountry, setFilterCountry] = useState<string | null>(null);
 
   const originalUsers = useRef<User[]>([]);
@@ -16,7 +16,9 @@ function App() {
   };
 
   const toggleSortByCountry = () => {
-    setSortByCounty((prevState) => !prevState);
+    const newSortingValue =
+      sorting === SortBy.NONE ? SortBy.COUNTRY : SortBy.NONE;
+    setSorting(newSortingValue);
   };
 
   const handleReset = () => {
@@ -26,6 +28,10 @@ function App() {
   const handleDelete = (email: string) => {
     const filteredUsers = users.filter((user) => user.email !== email);
     setUsers(filteredUsers);
+  };
+
+  const handleChangeSort = (sort: SortBy) => {
+    setSorting(sort);
   };
 
   useEffect(() => {
@@ -40,21 +46,33 @@ function App() {
       });
   }, []);
 
-  const filteredUsers =
-    typeof filterCountry === "string" && filterCountry.length > 0
+  const filteredUsers = useMemo(() => {
+    return typeof filterCountry === "string" && filterCountry.length > 0
       ? users.filter((user) => {
           return user.location.country
             .toLowerCase()
             .includes(filterCountry.toLowerCase());
         })
       : users;
+  }, [users, filterCountry]);
 
-  const sortedUsers = sortByCountry
-    ? filteredUsers.toSorted((a, b) => {
-        return a.location.country.localeCompare(b.location.country);
-      })
-    : filteredUsers;
   //el .sort solo muta el array og por lo cual no se puede volver al og cuando seleccionamos unsort. toSorted devuelve un nuevo array
+  const sortedUsers = useMemo(() => {
+    console.log("calculate sortedUsers");
+
+    if (sorting === SortBy.NONE) return filteredUsers;
+
+    const compareProperties: Record<string, (user: User) => any> = {
+      [SortBy.COUNTRY]: (user) => user.location.country,
+      [SortBy.NAME]: (user) => user.name.first,
+      [SortBy.LAST]: (user) => user.name.last,
+    };
+
+    return filteredUsers.toSorted((a, b) => {
+      const extractProperty = compareProperties[sorting];
+      return extractProperty(a).localeCompare(extractProperty(b));
+    });
+  }, [filteredUsers, sorting]);
 
   return (
     <div className="App">
@@ -62,7 +80,7 @@ function App() {
       <header>
         <button onClick={toggleColors}>Select Records</button>
         <button onClick={toggleSortByCountry}>
-          {sortByCountry ? "Unsort" : "Sort by Country"}
+          {sorting === SortBy.COUNTRY ? "Unsort" : "Sort by Country"}
         </button>
         <button onClick={handleReset}>Resetear Estado</button>
 
@@ -79,6 +97,7 @@ function App() {
           users={sortedUsers}
           showColor={showColors}
           deleteUser={handleDelete}
+          changeSorting={handleChangeSort}
         />
       </main>
     </div>

@@ -1,6 +1,8 @@
 import { version } from "react";
 import reactLogo from "./assets/react.svg";
+import { Form } from "./components/Form";
 import "./App.css";
+import { UseFetchExample } from "./clase/useExample";
 
 function App() {
   // const [count, setCount] = useState(0);
@@ -13,15 +15,11 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
           <h1 style={{ marginBottom: 0 }}>Hi React 19</h1>
           <small style={{ color: "yellow", fontSize: "10px" }}>
-            La version es {version}{" "}
+            La version es {version}
           </small>
         </a>
+        <UseFetchExample />
       </div>
-
-      <form>
-        <input type="text" />
-        <button type="submit">Submit</button>
-      </form>
     </>
   );
 }

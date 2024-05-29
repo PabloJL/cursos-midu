@@ -1,6 +1,5 @@
 import { version } from "react";
 import reactLogo from "./assets/react.svg";
-import { Form } from "./components/Form";
 import "./App.css";
 import { UseFetchExample } from "./clase/useExample";
 

@@ -29,6 +29,7 @@ export function UseFetchExample() {
   );
 }
 
+// eslint-disable-next-line react/prop-types
 function ShowPokemon({ pokemonPromise }) {
   const pokemon = use(pokemonPromise);
 

@@ -2,6 +2,7 @@ import { version } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 import { UseFetchExample } from "./clase/useExample";
+import { UseContextExample } from "./clase/useContext";
 
 function App() {
   // const [count, setCount] = useState(0);
@@ -17,6 +18,7 @@ function App() {
             La version es {version}
           </small>
         </a>
+        <UseContextExample />
         <UseFetchExample />
       </div>
     </>

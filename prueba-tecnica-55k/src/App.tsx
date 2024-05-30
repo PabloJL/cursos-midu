@@ -9,6 +9,9 @@ function App() {
   const [sorting, setSorting] = useState<SortBy>(SortBy.NONE);
   const [filterCountry, setFilterCountry] = useState<string | null>(null);
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
   const originalUsers = useRef<User[]>([]);
 
   const toggleColors = () => {
@@ -35,7 +38,8 @@ function App() {
   };
 
   useEffect(() => {
-    fetch("https://randomuser.me/api?results=100")
+    setLoading(true);
+    fetch("https://randomuser.me/api?results=10")
       .then(async (res) => await res.json())
       .then((res) => {
         setUsers(res.results);
@@ -43,6 +47,9 @@ function App() {
       })
       .catch((err) => {
         console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
@@ -58,10 +65,9 @@ function App() {
 
   //el .sort solo muta el array og por lo cual no se puede volver al og cuando seleccionamos unsort. toSorted devuelve un nuevo array
   const sortedUsers = useMemo(() => {
-    console.log("calculate sortedUsers");
-
     if (sorting === SortBy.NONE) return filteredUsers;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const compareProperties: Record<string, (user: User) => any> = {
       [SortBy.COUNTRY]: (user) => user.location.country,
       [SortBy.NAME]: (user) => user.name.first,
@@ -93,12 +99,17 @@ function App() {
         />
       </header>
       <main>
-        <UsersList
-          users={sortedUsers}
-          showColor={showColors}
-          deleteUser={handleDelete}
-          changeSorting={handleChangeSort}
-        />
+        {loading && <p>Loading ...</p>}
+        {!loading && error && <p>There´s been an error</p>}
+        {!loading && !error && users.length === 0 && <p>There´s no users</p>}
+        {!loading && !error && users.length > 0 && (
+          <UsersList
+            users={sortedUsers}
+            showColor={showColors}
+            deleteUser={handleDelete}
+            changeSorting={handleChangeSort}
+          />
+        )}
       </main>
     </div>
   );

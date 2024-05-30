@@ -11,6 +11,7 @@ function App() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const originalUsers = useRef<User[]>([]);
 
@@ -39,19 +40,29 @@ function App() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("https://randomuser.me/api?results=10")
-      .then(async (res) => await res.json())
+    setError(false);
+    fetch(
+      `https://randomuser.me/api?results=10&seed=midudev&page=${currentPage}`
+    )
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Error on the request");
+        return await res.json();
+      })
       .then((res) => {
-        setUsers(res.results);
-        originalUsers.current = res.results;
+        setUsers((prevUsers) => {
+          const newUsers = prevUsers.concat(res.results);
+          originalUsers.current = newUsers;
+          return newUsers;
+        });
       })
       .catch((err) => {
+        setError(err);
         console.error(err);
       })
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [currentPage]);
 
   const filteredUsers = useMemo(() => {
     return typeof filterCountry === "string" && filterCountry.length > 0
@@ -99,16 +110,22 @@ function App() {
         />
       </header>
       <main>
-        {loading && <p>Loading ...</p>}
-        {!loading && error && <p>There´s been an error</p>}
-        {!loading && !error && users.length === 0 && <p>There´s no users</p>}
-        {!loading && !error && users.length > 0 && (
+        {users.length > 0 && (
           <UsersList
             users={sortedUsers}
             showColor={showColors}
             deleteUser={handleDelete}
             changeSorting={handleChangeSort}
           />
+        )}
+        {loading && <p>Loading ...</p>}
+        {error && <p>There´s been an error</p>}
+        {!error && users.length === 0 && <p>There´s no users</p>}
+
+        {!loading && !error && (
+          <button onClick={() => setCurrentPage(currentPage + 1)}>
+            Load more users
+          </button>
         )}
       </main>
     </div>

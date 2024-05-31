@@ -2,49 +2,16 @@ import { useMemo, useState } from "react";
 import "./App.css";
 import { SortBy, type User } from "./types.d";
 import { UsersList } from "./components/UsersList";
-import { useInfiniteQuery } from "@tanstack/react-query";
-
-const fetchUsers = async ({ pageParam = 1 }: { pageParam?: number }) => {
-  return await fetch(
-    `https://randomuser.me/api?results=10&seed=midudev&page=${pageParam}`
-  )
-    .then(async (res) => {
-      if (!res.ok) throw new Error("Error on the request");
-      return await res.json();
-    })
-    .then((res) => {
-      const currentPage = Number(res.info.page);
-      const nextCursor = currentPage > 10 ? undefined : currentPage + 1;
-      return {
-        users: res.results,
-        nextCursor,
-      };
-    });
-};
+import { useUsers } from "./hooks/useUsers";
+import Results from "./components/Results";
 
 function App() {
-  const {
-    data,
-    isError,
-    isLoading,
-    refetch,
-    fetchNextPage,
-    hasNextPage,
-    // isFetching,
-    // isFetchingNextPage,
-    // status,
-  } = useInfiniteQuery<{ users: User[]; nextCursor?: number }>({
-    queryKey: ["users"],
-    queryFn: fetchUsers,
-    initialPsageParam: 1,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-  });
+  const { users, isError, isLoading, refetch, fetchNextPage, hasNextPage } =
+    useUsers();
   const [showColors, setShowColors] = useState(false);
   const [sorting, setSorting] = useState<SortBy>(SortBy.NONE);
   const [filterCountry, setFilterCountry] = useState<string | null>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const users: User[] = data?.pages?.flatMap((page) => page.users) ?? [];
   const toggleColors = () => {
     setShowColors(!showColors);
   };
@@ -99,6 +66,7 @@ function App() {
   return (
     <div className="App">
       <h1>Prueba Técnica</h1>
+      <Results />
       <header>
         <button onClick={toggleColors}>Select Records</button>
         <button onClick={toggleSortByCountry}>

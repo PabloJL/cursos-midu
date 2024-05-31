@@ -98,7 +98,9 @@ function App() {
         {!isLoading && !isError && hasNextPage && (
           <button onClick={() => fetchNextPage()}>Load more users</button>
         )}
-        {!isLoading && !isError && !hasNextPage && <p>No hay mas resultados</p>}
+        {!isLoading && !isError && !hasNextPage && (
+          <p>There are not any more results</p>
+        )}
       </main>
     </div>
   );

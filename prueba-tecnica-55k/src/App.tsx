@@ -13,7 +13,8 @@ const fetchUsers = async ({ pageParam = 1 }: { pageParam?: number }) => {
       return await res.json();
     })
     .then((res) => {
-      const nextCursor = Number(res.info.page);
+      const currentPage = Number(res.info.page);
+      const nextCursor = currentPage > 10 ? undefined : currentPage + 1;
       return {
         users: res.results,
         nextCursor,
@@ -32,16 +33,17 @@ function App() {
     // isFetching,
     // isFetchingNextPage,
     // status,
-  } = useInfiniteQuery<{ users: User[]; nextCursor: number }>({
+  } = useInfiniteQuery<{ users: User[]; nextCursor?: number }>({
     queryKey: ["users"],
     queryFn: fetchUsers,
     initialPsageParam: 1,
-    getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
   const [showColors, setShowColors] = useState(false);
   const [sorting, setSorting] = useState<SortBy>(SortBy.NONE);
   const [filterCountry, setFilterCountry] = useState<string | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const users: User[] = data?.pages?.flatMap((page) => page.users) ?? [];
   const toggleColors = () => {
     setShowColors(!showColors);
@@ -54,7 +56,7 @@ function App() {
   };
 
   const handleReset = async () => {
-    await refetch();
+    void refetch();
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -125,9 +127,10 @@ function App() {
         {isError && <p>There´s been an error</p>}
         {!isError && users.length === 0 && <p>There´s no users</p>}
 
-        {!isLoading && !isError && (
+        {!isLoading && !isError && hasNextPage && (
           <button onClick={() => fetchNextPage()}>Load more users</button>
         )}
+        {!isLoading && !isError && !hasNextPage && <p>No hay mas resultados</p>}
       </main>
     </div>
   );

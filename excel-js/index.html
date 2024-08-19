@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=+, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Excel.js</title>
     <style>
       body {
@@ -10,43 +10,132 @@
           Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
           sans-serif;
       }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
       img {
         max-width: 20px;
         height: auto;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      thead,
+      tr td:first-child {
+        background: #eee;
+      }
+
+      th,
+      td {
+        border: 1px solid #ccc;
+        font-weight: normal;
+        font-size: 12px;
+        text-align: center;
+        width: 64px;
+        height: 20px;
+        vertical-align: middle;
+        position: relative;
+      }
+
+      /* td:active {
+      border-radius: 2px;
+      outline: 2px solid #09f;
+    } */
+
+      span,
+      input {
+        position: absolute;
+        inset: 0;
+        vertical-align: middle;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      input {
+        border: 0;
+        opacity: 0;
+        pointer-events: none;
+        width: 100%;
+        border-radius: 2px;
+        &:focus {
+          opacity: 1;
+          outline: 2px solid #09f;
+          scale: 1.2;
+        }
       }
     </style>
     <script type="module">
       const $ = (el) => document.querySelector(el);
       const $$ = (el) => document.querySelectorAll(el);
 
+      const $table = $("table");
+      const $head = $("thead");
+      const $body = $("tbody");
+
       const ROWS = 10;
       const COLUMNS = 10;
+      const FIRTS_CHAR_CODE = 65;
 
       const range = (length) => Array.from({ length }, (_, i) => i);
+      const getColumn = (i) => String.fromCharCode(FIRTS_CHAR_CODE + i);
+
+      let STATE = range(COLUMNS).map((i) =>
+        range(ROWS).map((j) => ({ computedValue: 0, value: 0 }))
+      );
+
+      function updateCell({ x, y, value }) {
+        const newState = structuredClone(STATE);
+
+        const cell = newState[x][y];
+
+        cell.computedValue = computeValue(value);
+        cell.value = value;
+
+        newState[x][y] = cell;
+        STATE = newState;
+        renderSpreadSheet();
+      }
+
+      function computeValue(value) {
+        if (!value.startsWith("=")) return value;
+
+        const formula = value.slice(1);
+
+        let computedValue;
+        try {
+          computedValue = eval(formula);
+        } catch (e) {
+          computedValue = `!ERROR: ${e.message}`;
+        }
+        return computedValue;
+      }
 
       const renderSpreadSheet = () => {
-        const $table = $("table");
-        const $head = $("thead");
-        const $body = $("tbody");
-
         const headerHTML = `<tr>
             <th></th>
             ${range(COLUMNS)
-              .map((i) => `<th>${i}</th>`)
+              .map((i) => `<th>${getColumn(i)}</th>`)
               .join("")}
             </tr>`;
         $head.innerHTML = headerHTML;
 
         const bodyHTML = range(ROWS)
           .map((row) => {
-            return `<tr> 
+            return `<tr>
             <td>${row + 1}</td>
              ${range(COLUMNS)
                .map(
                  (column) =>
                    `<td data-x="${column}" data-y="${row}">
-                    <span></span>
-                    <input type="text" value=""/>
+                    <span>${STATE[column][row].computedValue}</span>
+                    <input type="text" value="${STATE[column][row].value}"/>
                     </td>`
                )
                .join("")}
@@ -56,6 +145,33 @@
         $body.innerHTML = bodyHTML;
       };
 
+      $body.addEventListener("click", (e) => {
+        const td = e.target.closest("td");
+        if (!td) return;
+
+        const { x, y } = td.dataset;
+        const input = td.querySelector("input");
+        const span = td.querySelector("span");
+
+        const end = input.value.length;
+        input.setSelectionRange(end, end);
+        input.focus();
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") input.blur();
+        });
+
+        input.addEventListener(
+          "blur",
+          () => {
+            console.log({ value: input.value, state: STATE[x][y].value });
+            if (input.value === STATE[x][y].value) return;
+
+            updateCell({ x, y, value: input.value });
+          },
+          { once: true }
+        );
+      });
       renderSpreadSheet();
     </script>
   </head>

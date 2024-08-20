@@ -92,15 +92,30 @@
 
       function updateCell({ x, y, value }) {
         const newState = structuredClone(STATE);
+        const constants = generateCellsConstants(newState);
 
         const cell = newState[x][y];
 
-        cell.computedValue = computeValue(value);
+        cell.computedValue = computeValue(value, constants);
         cell.value = value;
 
         newState[x][y] = cell;
         STATE = newState;
         renderSpreadSheet();
+      }
+
+      function generateCellsConstants(cells) {
+        return cells
+          .map((rows, x) => {
+            return rows
+              .map((cell, y) => {
+                const letter = getColumn(x);
+                const cellId = `${letter}${y + 1}`;
+                return `const ${cellId}= ${cell.computeValue};`;
+              })
+              .join("\n");
+          })
+          .join("\n");
       }
 
       function computeValue(value) {

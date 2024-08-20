@@ -196,6 +196,9 @@
         input.setSelectionRange(end, end);
         input.focus();
 
+        $$(".selected").forEach((el) => el.classList.remove("selected"));
+        selectedColumn = null;
+
         input.addEventListener("keydown", (e) => {
           if (e.key === "Enter") input.blur();
         });

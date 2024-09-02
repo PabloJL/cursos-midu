@@ -18,10 +18,53 @@
         max-width: 500px;
         margin: 0 auto;
       }
+      h1 {
+        color: #fce300;
+        font-size: 50px;
+        font-weight: 600;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+
+        img {
+          width: 50px;
+          height: auto;
+        }
+      }
+      canvas {
+        background: #fff;
+      }
+      header {
+        background: silver;
+        padding: 2px;
+        width: 500px;
+        button {
+          border: 0;
+          background: transparent;
+          box-shadow: 1px 1px black, inset -1px -1px gray, inset 1px 1px white;
+        }
+      }
     </style>
-    <script type="module"></script>
+    <script type="module">
+      const $ = (selector) => document.querySelector(selector);
+      const $$ = (selector) => document.querySelectorAll(selector);
+    </script>
   </head>
   <body>
-    <h1>Paint.js</h1>
+    <h1><img src="./icon.png" alt="Paint.js" /> Paint.js</h1>
+
+    <header>
+      <button>File</button><button>Edit</button><button>View</button
+      ><button>Image</button><button>Options</button><button>Help</button>
+    </header>
+    <main>
+      <canvas id="canvas" width="500" height="400"></canvas>
+    </main>
+
+    <footer>
+      <input type="color" id="color-picker" value="#000000" />
+    </footer>
   </body>
 </html>

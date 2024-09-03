@@ -160,6 +160,7 @@
 
       //State
       let isDrawing = false;
+      let isShiftPressed = false;
       let startX, startY;
       let lastX = 0;
       let lastY = 0;
@@ -173,6 +174,15 @@
       $canvas.addEventListener("mouseleave", stopDrawing);
 
       $colorPicker.addEventListener("change", handleChangeColor);
+
+      //CAPS
+      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener("keyup", handleKeyUp);
+
+      //Picker
+      $pickerBtn.addEventListener("click", () => {
+        setMode(MODES.PICKER);
+      });
 
       //Clear
       $clearBtn.addEventListener("click", clearCanvas);
@@ -222,9 +232,15 @@
         if (mode === MODES.RECTANGLE) {
           ctx.putImageData(imageData, 0, 0);
 
-          const width = offsetX - startX;
-          const height = offsetY - startY;
+          let width = offsetX - startX;
+          let height = offsetY - startY;
 
+          if (isShiftPressed) {
+            const sideLength = Math.min(Math.abs(width), Math.abs(height));
+
+            width = width > 0 ? sideLength : -sideLength;
+            height = height > 0 ? sideLength : -sideLength;
+          }
           ctx.beginPath();
           ctx.rect(startX, startY, width, height);
           ctx.stroke();
@@ -244,7 +260,8 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
 
-      function setMode(newMode) {
+      async function setMode(newMode) {
+        let previousMode = mode;
         mode = newMode;
 
         $("button.active")?.classList.remove("active");
@@ -270,10 +287,40 @@
           ctx.lineWidth = 50;
           return;
         }
+        if (mode === MODES.PICKER) {
+          $pickerBtn.classList.add("active");
+          const eyeDropper = new window.EyeDropper();
+          try {
+            const result = await eyeDropper.open();
+            const { sRGBHex } = result;
+            ctx.strokeStyle = sRGBHex;
+            $colorPicker.value = sRGBHex;
+            setMode(previousMode);
+          } catch (e) {
+            //error o usuario no recupero ningun color
+          }
+          return;
+        }
       }
 
+      //KEYDOWN
+      function handleKeyDown({ key }) {
+        isShiftPressed = key = "Shift";
+      }
+
+      function handleKeyUp({ key }) {
+        if (key === "Shift") isShiftPressed = false;
+      }
       //INIT
       setMode(MODES.DRAW);
+
+      //Show picker if browser has support
+      if (typeof window.EyeDropper !== "undefined") {
+        $pickerBtn.removeAttribute("disabled");
+      }
+
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
     </script>
   </head>
   <body>

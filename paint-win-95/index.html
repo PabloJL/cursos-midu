@@ -177,6 +177,11 @@
       //Clear
       $clearBtn.addEventListener("click", clearCanvas);
 
+      //Erase
+      $eraseBtn.addEventListener("click", () => {
+        setMode(MODES.ERASE);
+      });
+
       //Modes
       $rectangleBtn.addEventListener("click", () => {
         setMode(MODES.RECTANGLE);
@@ -200,7 +205,7 @@
 
         const { offsetX, offsetY } = e;
 
-        if (mode === MODES.DRAW) {
+        if (mode === MODES.DRAW || mode === MODES.ERASE) {
           //comenzar trazado
           ctx.beginPath();
           //mover trazado a las coordenadas actuales
@@ -247,16 +252,28 @@
         if (mode === MODES.DRAW) {
           $drawBtn.classList.add("active");
           canvas.style.cursor = "crosshair";
+          ctx.globalCompositeOperation = "source-over";
           ctx.lineWidth = 2;
           return;
         }
         if (mode === MODES.RECTANGLE) {
           $rectangleBtn.classList.add("active");
           canvas.style.cursor = "nw-resize";
+          ctx.globalCompositeOperation = "source-over";
           ctx.lineWidth = 2;
           return;
         }
+        if (mode === MODES.ERASE) {
+          $eraseBtn.classList.add("active");
+          canvas.style.cursor = 'url("./cursors/erase.png") 0 24, auto';
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.lineWidth = 50;
+          return;
+        }
       }
+
+      //INIT
+      setMode(MODES.DRAW);
     </script>
   </head>
   <body>

@@ -155,6 +155,7 @@
       const $drawBtn = $("#draw-btn");
       const $eraseBtn = $("#erase-btn");
       const $rectangleBtn = $("#rectangle-btn");
+      const $ellipseBtn = $("#ellipse-btn");
       const $pickerBtn = $("#picker-btn");
       const ctx = $canvas.getContext("2d");
 
@@ -274,6 +275,13 @@
           return;
         }
         if (mode === MODES.RECTANGLE) {
+          $rectangleBtn.classList.add("active");
+          canvas.style.cursor = "nw-resize";
+          ctx.globalCompositeOperation = "source-over";
+          ctx.lineWidth = 2;
+          return;
+        }
+        if (mode === MODES.ELLIPSE) {
           $rectangleBtn.classList.add("active");
           canvas.style.cursor = "nw-resize";
           ctx.globalCompositeOperation = "source-over";

@@ -258,6 +258,12 @@
           let width = Math.abs(offsetX - startX) / 2;
           let height = Math.abs(offsetY - startY) / 2;
 
+          if (isShiftPressed) {
+            const radius = Math.min(width, height);
+            width = radius;
+            height = radius;
+          }
+
           // Calculate the center of the ellipse
           let centerX = startX + (offsetX < startX ? -width : width);
           let centerY = startY + (offsetY < startY ? -height : height);

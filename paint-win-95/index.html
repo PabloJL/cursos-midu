@@ -197,6 +197,11 @@
       $rectangleBtn.addEventListener("click", () => {
         setMode(MODES.RECTANGLE);
       });
+
+      $ellipseBtn.addEventListener("click", () => {
+        setMode(MODES.ELLIPSE);
+      });
+
       $drawBtn.addEventListener("click", () => {
         setMode(MODES.DRAW);
       });
@@ -247,6 +252,29 @@
           ctx.stroke();
           return;
         }
+        if (mode === MODES.ELLIPSE) {
+          ctx.putImageData(imageData, 0, 0);
+
+          let width = Math.abs(offsetX - startX) / 2;
+          let height = Math.abs(offsetY - startY) / 2;
+
+          // Calculate the center of the ellipse
+          let centerX = startX + (offsetX < startX ? -width : width);
+          let centerY = startY + (offsetY < startY ? -height : height);
+
+          ctx.beginPath();
+          ctx.ellipse(
+            centerX, // x (center of the ellipse)
+            centerY, // y (center of the ellipse)
+            width, // radiusX (horizontal radius)
+            height, // radiusY (vertical radius)
+            0, // rotation (rotation in radians)
+            0, // startAngle (start angle in radians)
+            Math.PI * 2 // endAngle (end angle in radians)
+          );
+          ctx.stroke();
+          return;
+        }
       }
       function stopDrawing(e) {
         isDrawing = false;
@@ -282,7 +310,7 @@
           return;
         }
         if (mode === MODES.ELLIPSE) {
-          $rectangleBtn.classList.add("active");
+          $ellipseBtn.classList.add("active");
           canvas.style.cursor = "nw-resize";
           ctx.globalCompositeOperation = "source-over";
           ctx.lineWidth = 2;
